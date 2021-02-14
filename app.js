@@ -44,8 +44,11 @@ const selectItem = (event, img) => {
   let item = sliders.indexOf(img);
   if (item === -1) {
     sliders.push(img);
+    return item;
   } else {
     sliders.splice(item, 1);
+    return item;
+
   }
 }
 var timer
