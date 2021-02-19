@@ -5,6 +5,7 @@ const searchBtn = document.getElementById('search-btn');
 const sliderBtn = document.getElementById('create-slider');
 const sliderContainer = document.getElementById('sliders');
 const search = document.getElementById('search');
+const errorMassage = document.getElementById('warning');
 // selected image 
 let sliders = [];
 
@@ -18,6 +19,7 @@ const KEY = '15674931-a9d714b6e9d654524df198e00&q';
 const showImages = (images) => {
   imagesArea.style.display = 'block';
   gallery.innerHTML = '';
+  toggleSpinner();
   // show gallery title
   galleryHeader.style.display = 'flex';
   images.forEach(image => {
@@ -33,13 +35,13 @@ const getImages = (query) => {
   fetch(`https://pixabay.com/api/?key=${KEY}=${query}&image_type=photo&pretty=true`)
     .then(response => response.json())
     .then(data => showImages(data.hits))
-    .catch(err => console.log(err))
+    .catch(error => displayError('Something is wrong try again later!!'))
 }
 
 let slideIndex = 0;
 const selectItem = (event, img) => {
   let element = event.target;
-  element.classList.add('added');
+  element.classList.toggle('added');
  
   let item = sliders.indexOf(img);
   if (item === -1) {
@@ -47,11 +49,11 @@ const selectItem = (event, img) => {
     return item;
   } else {
     sliders.splice(item, 1);
-    return item;
+    
 
   }
-}
-var timer
+};
+var timer;
 const createSlider = () => {
   // check slider image length
   if (sliders.length < 2) {
@@ -82,6 +84,7 @@ const createSlider = () => {
       src="${slide}"
       alt="">`;
       sliderContainer.appendChild(item)
+      
     })
     changeSlide(0)
     timer = setInterval(function () {
@@ -120,10 +123,21 @@ const changeSlide = (index) => {
 }
 
 searchBtn.addEventListener('click', function () {
-  document.querySelector('.main').style.display = 'none';
-  clearInterval(timer);
-  getImages(search.value)
-  sliders.length = 0;
+  if(search.value === "" || search.value === null){
+    // errorMassage.style.display = 'none'
+    errorMassage.style.display = 'block'
+  }
+  else{
+    document.querySelector('.main').style.display = 'none';
+    clearInterval(timer);
+    getImages(search.value);
+    sliders.length = 0;
+    errorMassage.innerText = '';
+    toggleSpinner();
+    
+  }
+  
+  
 })
 
 search.addEventListener("keypress", function(event) {
@@ -135,3 +149,18 @@ search.addEventListener("keypress", function(event) {
 sliderBtn.addEventListener('click', function () {
   createSlider();
 })
+
+const toggleSpinner = () =>{
+   const spinner = document.getElementById('loading-Spinner');
+   const images = document.querySelector('.images');
+    spinner.classList.toggle('d-none');
+    images.classList.toggle('d-none');
+   
+   
+   
+
+};
+const displayError = (error) => {
+  const errorTag = document.getElementById('error');
+  errorTag.innerText = error
+}
